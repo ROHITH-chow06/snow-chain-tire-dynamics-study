@@ -1,0 +1,19 @@
+# MATLAB generated files
+*.asv
+*.m~
+*.autosave
+
+# MATLAB cache / generated project data
+resources/project/
+resources/codegen/
+
+# Temporary files
+*.tmp
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Generated simulation/results files
+*.fig
