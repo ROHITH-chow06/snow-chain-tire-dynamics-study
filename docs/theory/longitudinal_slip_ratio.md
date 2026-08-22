@@ -43,6 +43,9 @@ Across vehicle dynamics literature, varying sign conventions exist for longitudi
 * **$\kappa = -1$ (Wheel Lockup):**
   When the wheel is completely locked under braking ($\omega = 0$) while the vehicle is moving at $V_x > \epsilon$, $\kappa = \frac{0 - V_x}{V_x} = -1.0$ (100% braking slip).
 
+### Scope: Forward Vehicle Motion
+The kinematic slip formulation and sign convention in Phase 1A are defined specifically for forward vehicle travel ($V_x > 0$). Reverse vehicle motion ($V_x < 0$), where velocity sign reversals require modified kinematics and directional references, is outside the current Phase 1A scope.
+
 ---
 
 ## 5. Low-Speed Numerical Regularization
@@ -54,10 +57,11 @@ $$\kappa = \frac{R\omega - V_x}{|V_x|}$$
 When the vehicle decelerates toward a standstill ($V_x \to 0$), the unregularized kinematic denominator approaches zero, leading to division-by-zero singularities ($\text{NaN}$ or $\text{Inf}$).
 
 ### Regularization Strategy
-To ensure smooth numerical evaluation without artificial branching or non-differentiable conditions:
+To ensure continuous numerical evaluation without division-by-zero singularities:
 - A floor threshold $\epsilon$ (default: $0.1\text{ m/s}$) is applied to the denominator: $\text{denom} = \max(|V_x|, \epsilon)$.
+- The regularization function $\max(|V_x|, \epsilon)$ is continuous ($C^0$) across all $V_x$, but exhibits a derivative slope discontinuity (non-smooth corner) at $|V_x| = \epsilon$.
 - At complete standstill ($V_x = 0, \omega = 0$), the regularized equation produces $\kappa = 0$, reflecting zero steady-state slip.
-- During low-speed transitions, $\epsilon$ avoids numerical overflow while preserving the continuous sign of the slip.
+- During low-speed transitions, $\epsilon$ bounds the denominator from below, avoiding numerical overflow while preserving the continuous sign of the slip.
 
 ---
 
@@ -65,7 +69,8 @@ To ensure smooth numerical evaluation without artificial branching or non-differ
 
 1. **Rigid / Effective Radius Assumption:** The rolling radius $R$ is treated as a constant effective radius. In reality, $R$ varies dynamically with normal load, tire inflation pressure, centrifugal expansion at high rotational speeds, and carcass compliance.
 2. **Kinematic vs. Dynamic Slip:** The formula assumes quasi-steady-state kinematic slip. In high-frequency transients (such as rapid ABS cycling or abrupt traction spikes), tire carcass compliance and relaxation length dynamics ($L_r$) must be considered.
-3. **Standstill Physics:** While $\epsilon$-regularization prevents numerical failure at $V_x \approx 0$, purely kinematic slip formulations do not capture static friction (stiction) or elastic carcass deflection at rest.
+3. **Standstill Physics & Derivative Discontinuity:** While $\epsilon$-regularization prevents numerical failure at $V_x \approx 0$, it introduces a derivative slope change at $|V_x| = \epsilon$ and does not capture static friction (stiction) or elastic carcass deflection at rest.
+4. **Unidirectional Formulation:** Kinematics are defined for forward vehicle travel ($V_x > 0$).
 
 ---
 

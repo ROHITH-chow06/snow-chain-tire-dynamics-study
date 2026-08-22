@@ -5,9 +5,10 @@
 %   1. Pure rolling condition (R * omega == Vx -> kappa == 0)
 %   2. Positive driving slip (R * omega > Vx -> kappa > 0)
 %   3. Negative braking slip (R * omega < Vx -> kappa < 0)
-%   4. Vectorized evaluation across multiple operating points
-%   5. Near-zero vehicle speed regularization (no NaN or Inf)
-%   6. Locked wheel braking test (omega == 0 -> kappa == -1 at normal speed)
+%   4. Locked wheel braking test (omega == 0 -> kappa == -1 at normal speed)
+%   5. Vectorized evaluation across multiple operating points
+%   6. Near-zero vehicle speed regularization (no NaN or Inf)
+%   7. Incompatible dimension rejection (omega vs Vx size mismatch)
 
 clear;
 clc;
@@ -111,7 +112,23 @@ assert(abs(kappa_near_zero - expected_near_zero) < tol, ...
     'Test 6 Failed: Regularization calculation mismatch.');
 fprintf('PASSED (standstill & eps-regularization verified)\n');
 
+%% Test 7: Incompatible Dimension Rejection
+fprintf('Test 7: Incompatible dimension rejection... ');
+omega_incompat = [10, 20, 30];          % 1x3 row vector
+Vx_incompat = [10; 20; 30; 40];         % 4x1 column vector
+
+threwError = false;
+try
+    longitudinalSlipRatio(R, omega_incompat, Vx_incompat);
+catch ME
+    threwError = true;
+    assert(strcmp(ME.identifier, 'longitudinalSlipRatio:dimensionMismatch'), ...
+        'Test 7 Failed: Expected dimensionMismatch error ID, got: %s', ME.identifier);
+end
+assert(threwError, 'Test 7 Failed: Function did not reject incompatible dimensions.');
+fprintf('PASSED (dimension mismatch correctly rejected)\n');
+
 %% Summary
 fprintf('\n====================================================\n');
-fprintf('  All 6 verification tests PASSED successfully.\n');
+fprintf('  All 7 verification tests PASSED successfully.\n');
 fprintf('====================================================\n');
