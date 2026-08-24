@@ -42,11 +42,14 @@ function params = roverParameters()
     params.g = 9.81;            % Gravitational acceleration [m/s^2]
 
     % Dimensions and geometry
-    params.lf = 0.40;           % CG to front axle distance [m]
-    params.lr = 0.40;           % CG to rear axle distance [m]
-    params.tf = 0.60;           % Front axle track width [m]
-    params.tr = 0.60;           % Rear axle track width [m]
-    params.R  = 0.15;           % Effective wheel rolling radius [m]
+    params.lf  = 0.40;          % CG to front axle distance [m]
+    params.lr  = 0.40;          % CG to rear axle distance [m]
+    params.tf  = 0.60;          % Front axle track width [m]
+    params.tr  = 0.60;          % Rear axle track width [m]
+    params.R   = 0.15;          % Effective wheel rolling radius [m]
+    params.hCG = 0.30;          % Center of gravity height above ground [m]
+                                % Note: Representative modeling parameter for quasi-static
+                                % load transfer, not an experimental measurement.
 
     params.L = params.lf + params.lr; % Wheelbase [m] (0.80 m)
     params.W = params.tf;             % Representative body width [m] (0.60 m)
