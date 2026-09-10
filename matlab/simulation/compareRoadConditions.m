@@ -26,13 +26,16 @@ Fz = 4000.0;    % Vertical tire normal load [N] (held constant across conditions
 nPoints = 2001; % Discretization resolution
 kappa = linspace(-1.0, 1.0, nPoints)';
 
-% 2. Sourced Representative Parameter Sets (MathWorks Vehicle Dynamics Blockset)
-% Dry Tarmac
-dry.B = 10.0; dry.C = 1.90; dry.D = 1.00; dry.E = 0.97;
-% Wet Tarmac
-wet.B = 12.0; wet.C = 2.30; wet.D = 0.82; wet.E = 1.00;
-% Snow
-snow.B = 5.0; snow.C = 2.00; snow.D = 0.30; snow.E = 1.00;
+% 2. Sourced Representative Parameter Sets (Canonical Phase 3J Conditions)
+% These are fetched directly from the unified roadSurfaceCondition factory.
+c_dry = roadSurfaceCondition('Dry');
+dry.B = c_dry.pure_params.Bx; dry.C = c_dry.pure_params.Cx; dry.D = c_dry.pure_params.Dx; dry.E = c_dry.pure_params.Ex;
+
+c_wet = roadSurfaceCondition('Wet');
+wet.B = c_wet.pure_params.Bx; wet.C = c_wet.pure_params.Cx; wet.D = c_wet.pure_params.Dx; wet.E = c_wet.pure_params.Ex;
+
+c_snow = roadSurfaceCondition('Snow');
+snow.B = c_snow.pure_params.Bx; snow.C = c_snow.pure_params.Cx; snow.D = c_snow.pure_params.Dx; snow.E = c_snow.pure_params.Ex;
 
 % 3. Force Evaluation using the validated Phase 1B function
 Fx_dry  = magicFormulaLongitudinal(kappa, Fz, dry.B,  dry.C,  dry.D,  dry.E);
@@ -61,10 +64,10 @@ kappa_neg = kappa(negIdx);
 [Fx_wet_brake_mag,  idx_wet_b]  = max(abs(Fx_wet(negIdx)));   kappa_wet_brake  = kappa_neg(idx_wet_b);
 [Fx_snow_brake_mag, idx_snow_b] = max(abs(Fx_snow(negIdx)));  kappa_snow_brake = kappa_neg(idx_snow_b);
 
-% Effective peak friction coefficients
-mu_dry  = Fx_dry_peak  / Fz;
-mu_wet  = Fx_wet_peak  / Fz;
-mu_snow = Fx_snow_peak / Fz;
+% Achieved force-to-normal-load ratios over the evaluated slip range
+fx_over_fz_dry  = Fx_dry_peak  / Fz;
+fx_over_fz_wet  = Fx_wet_peak  / Fz;
+fx_over_fz_snow = Fx_snow_peak / Fz;
 
 % Forces at selected operating slip ratios: kappa = 0.05, 0.10, 0.20
 target_kappas = [0.05; 0.10; 0.20];
@@ -99,19 +102,19 @@ assert(abs(K0_dry - 76000.0) < tol, 'Check Failed: Dry initial stiffness deviate
 
 % 6. Display Formatted Console Summary
 fprintf('========================================================================================\n');
-fprintf('  Phase 2: Road Condition Parameterization & Comparative Modeling Summary\n');
+fprintf('  Phase 3J: Road Condition Parameterization & Comparative Modeling Summary\n');
 fprintf('========================================================================================\n');
 fprintf('Normal Load (Fz): %.1f N (Held constant for all conditions)\n\n', Fz);
 
-fprintf('%-12s | %-6s %-6s %-6s %-6s | %-12s | %-10s | %-10s | %-14s\n', ...
-    'Condition', 'B', 'C', 'D', 'E', 'Peak Fx [N]', 'Peak kappa', 'mu_peak', 'K0 [N/slip]');
-fprintf('----------------------------------------------------------------------------------------\n');
-fprintf('%-12s | %-6.1f %-6.2f %-6.2f %-6.2f | %-12.2f | %-10.4f | %-10.4f | %-14.1f\n', ...
-    'Dry Tarmac', dry.B, dry.C, dry.D, dry.E, Fx_dry_peak, kappa_dry_peak, mu_dry, K0_dry);
-fprintf('%-12s | %-6.1f %-6.2f %-6.2f %-6.2f | %-12.2f | %-10.4f | %-10.4f | %-14.1f\n', ...
-    'Wet Tarmac', wet.B, wet.C, wet.D, wet.E, Fx_wet_peak, kappa_wet_peak, mu_wet, K0_wet);
-fprintf('%-12s | %-6.1f %-6.2f %-6.2f %-6.2f | %-12.2f | %-10.4f | %-10.4f | %-14.1f\n', ...
-    'Snow', snow.B, snow.C, snow.D, snow.E, Fx_snow_peak, kappa_snow_peak, mu_snow, K0_snow);
+fprintf('%-12s | %-6s %-6s %-6s %-6s | %-12s | %-10s | %-8s | %-12s | %-14s\n', ...
+    'Condition', 'B', 'C', 'D', 'E', 'Max Fx [N]', 'Max kappa', 'D_param', 'Max Fx / Fz', 'K0 [N/slip]');
+fprintf('------------------------------------------------------------------------------------------------------\n');
+fprintf('%-12s | %-6.1f %-6.2f %-6.2f %-6.2f | %-12.2f | %-10.4f | %-8.2f | %-12.4f | %-14.1f\n', ...
+    'Dry Tarmac', dry.B, dry.C, dry.D, dry.E, Fx_dry_peak, kappa_dry_peak, dry.D, fx_over_fz_dry, K0_dry);
+fprintf('%-12s | %-6.1f %-6.2f %-6.2f %-6.2f | %-12.2f | %-10.4f | %-8.2f | %-12.4f | %-14.1f\n', ...
+    'Wet Tarmac', wet.B, wet.C, wet.D, wet.E, Fx_wet_peak, kappa_wet_peak, wet.D, fx_over_fz_wet, K0_wet);
+fprintf('%-12s | %-6.1f %-6.2f %-6.2f %-6.2f | %-12.2f | %-10.4f | %-8.2f | %-12.4f | %-14.1f\n', ...
+    'Snow', snow.B, snow.C, snow.D, snow.E, Fx_snow_peak, kappa_snow_peak, snow.D, fx_over_fz_snow, K0_snow);
 fprintf('----------------------------------------------------------------------------------------\n\n');
 
 fprintf('Force Comparison at Selected Slip Ratios:\n');
@@ -133,10 +136,10 @@ fprintf('=======================================================================
 
 % 7. Primary Visualization: Road Condition Longitudinal Tire Force Curves
 hFig1 = figure('Name', 'Road Condition Force Comparison', 'Color', 'w', 'Position', [100, 100, 850, 520], 'Visible', 'off');
-plot(kappa, Fx_dry,  'b-',  'LineWidth', 2.0, 'DisplayName', 'Dry Tarmac (\mu_{peak} = 1.00)');
+plot(kappa, Fx_dry,  'b-',  'LineWidth', 2.0, 'DisplayName', sprintf('Dry Tarmac (D = %.2f)', dry.D));
 hold on;
-plot(kappa, Fx_wet,  'r--', 'LineWidth', 2.0, 'DisplayName', 'Wet Tarmac (\mu_{peak} = 0.82)');
-plot(kappa, Fx_snow, 'm-.', 'LineWidth', 2.0, 'DisplayName', 'Snow (\mu_{peak} = 0.30)');
+plot(kappa, Fx_wet,  'r--', 'LineWidth', 2.0, 'DisplayName', sprintf('Wet Tarmac (D = %.2f)', wet.D));
+plot(kappa, Fx_snow, 'm-.', 'LineWidth', 2.0, 'DisplayName', sprintf('Snow (D = %.2f)', snow.D));
 
 % Highlight peak points
 plot(kappa_dry_peak,  Fx_dry_peak,  'bo', 'MarkerFaceColor', 'b', 'MarkerSize', 6, 'HandleVisibility', 'off');
@@ -177,13 +180,14 @@ peak_forces = [Fx_dry_peak; Fx_wet_peak; Fx_snow_peak];
 bar(conditions, peak_forces, 0.5, 'FaceColor', [0.2, 0.4, 0.8]);
 grid on;
 box on;
-ylabel('Peak Longitudinal Force F_{x,peak} [N]', 'FontSize', 11);
-title('Available Peak Longitudinal Force by Road Surface Condition (F_z = 4000 N)', 'FontSize', 12, 'FontWeight', 'bold');
+ylabel('Max Evaluated Longitudinal Force F_x [N]', 'FontSize', 11);
+title('Maximum Evaluated Longitudinal Force by Road Surface Condition (F_z = 4000 N)', 'FontSize', 12, 'FontWeight', 'bold');
 ylim([0, 5200]);
 
 % Add text values above bars
+actual_Ds = [dry.D, wet.D, snow.D];
 for i = 1:length(peak_forces)
-    text(i, peak_forces(i) + 250, sprintf('%.1f N\n(\\mu_{peak} = %.2f)', peak_forces(i), peak_forces(i)/Fz), ...
+    text(i, peak_forces(i) + 250, sprintf('%.1f N\n(D = %.2f)\n[Max Fx/Fz = %.2f]', peak_forces(i), actual_Ds(i), peak_forces(i)/Fz), ...
         'HorizontalAlignment', 'center', 'FontSize', 10, 'FontWeight', 'bold');
 end
 
@@ -208,7 +212,7 @@ D_vals    = [dry.D; wet.D; snow.D];
 E_vals    = [dry.E; wet.E; snow.E];
 Peak_Fx   = [Fx_dry_peak; Fx_wet_peak; Fx_snow_peak];
 Peak_k    = [kappa_dry_peak; kappa_wet_peak; kappa_snow_peak];
-Mu_peak   = [mu_dry; mu_wet; mu_snow];
+Peak_Fx_over_Fz = [fx_over_fz_dry; fx_over_fz_wet; fx_over_fz_snow];
 K0_vals   = [K0_dry; K0_wet; K0_snow];
 Fx_k05    = [Fx_dry_sel(1); Fx_wet_sel(1); Fx_snow_sel(1)];
 Fx_k10    = [Fx_dry_sel(2); Fx_wet_sel(2); Fx_snow_sel(2)];
@@ -217,11 +221,11 @@ Delta_Fx_pct = [0.0; pct_peak_wet; pct_peak_snow];
 Delta_K0_pct = [0.0; pct_K0_wet; pct_K0_snow];
 
 summaryTable = table(condNames, B_vals, C_vals, D_vals, E_vals, ...
-    Peak_Fx, Peak_k, Mu_peak, K0_vals, Fx_k05, Fx_k10, Fx_k20, Delta_Fx_pct, Delta_K0_pct, ...
+    Peak_Fx, Peak_k, D_vals, Peak_Fx_over_Fz, K0_vals, Fx_k05, Fx_k10, Fx_k20, Delta_Fx_pct, Delta_K0_pct, ...
     'VariableNames', {'Condition', 'B', 'C', 'D', 'E', ...
-    'Peak_Fx_N', 'Peak_kappa', 'mu_peak', 'K0_N_per_slip', ...
+    'Max_Fx_N', 'Max_kappa', 'D_param', 'Peak_Fx_over_Fz', 'K0_N_per_slip', ...
     'Fx_kappa_005_N', 'Fx_kappa_010_N', 'Fx_kappa_020_N', ...
-    'Peak_Fx_RelChange_pct', 'K0_RelChange_pct'});
+    'Max_Fx_RelChange_pct', 'K0_RelChange_pct'});
 
 csvFileSummary = fullfile(dataDir, 'road_condition_summary.csv');
 writetable(summaryTable, csvFileSummary);
