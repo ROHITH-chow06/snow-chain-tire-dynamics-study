@@ -1,202 +1,182 @@
-# Tire Grip and Four-Wheel Vehicle Dynamics on Snow
-
-### A MATLAB-based preliminary computational study of tire forces, vehicle response, and simplified snow-chain sensitivity
-
-## Overview
-
-This project began with a practical research question:
-
-> **How does additional traction provided by snow chains affect tire forces and the resulting behavior of a four-wheel vehicle on snow?**
-
-I independently developed a MATLAB-based vehicle-dynamics framework incrementally, beginning with tire-force fundamentals and progressing toward a simplified four-wheel model, time-domain simulation, trajectory analysis, and a controlled SnowChain benchmark.
-
-This is a **preliminary mathematical study**. It demonstrates understanding of tire-force modelling, vehicle dynamics, simulation, verification, and research limitations. It does not claim experimentally validated snow-chain performance.
-
-## Research Workflow
-
-```text
-Tire-force model
-       ↓
-Four-wheel tire kinematics
-       ↓
-Longitudinal and lateral tire forces
-       ↓
-Combined-slip formulation
-       ↓
-Dynamic normal-load transfer
-       ↓
-Closed-loop vehicle dynamics
-       ↓
-Time-domain simulation
-       ↓
-Vehicle trajectory integration
-       ↓
-Performance and handling analysis
-       ↓
-Snow vs. simplified SnowChain comparison
-```
-
-## What Was Implemented
-
-- Longitudinal slip-ratio calculation
-- Magic Formula longitudinal tire-force modelling
+# Tire Grip and Four-Wheel Vehicle Dynamics on Snow: A Preliminary Snow-Chain Sensitivity Study
+	## 1. Project Overview
+This project develops a transparent MATLAB framework for studying:
+- Longitudinal tire slip
+- Tire-force generation
 - Four-wheel vehicle kinematics
-- Lateral tire-force modelling
+- Lateral tire forces
 - Combined longitudinal/lateral slip
 - Dynamic normal-load transfer
-- Closed-loop planar vehicle dynamics
-- Time-domain numerical simulation
-- Global vehicle trajectory integration
-- Vehicle performance and handling metrics
-- Modular snow-condition parameter framework
-- Simplified SnowChain sensitivity benchmark
-- Component-level verification and regression testing
+- Wheel-level force distribution
+- Yaw moments
+- Closed-loop vehicle dynamics
+- Time-domain simulation
+- Trajectory integration
+- Vehicle-performance analysis
+- Snow-road modelling
+- Snow-chain sensitivity benchmarking
 
-The model uses a planar vehicle representation with prescribed wheel-speed and steering inputs. It does not attempt to reproduce a production vehicle, tire-testing rig, or high-fidelity snow-contact solver.
+The framework was developed incrementally and verified through staged testing.
+	## 2. Research Motivation
+This preliminary MATLAB-based computational research project began with a fundamental curiosity: how do snow chains influence longitudinal tire traction, and how does that change propagate to the motion of a four-wheel vehicle on snow? 
 
-## Phase 3K: Simplified SnowChain Benchmark
+The objective was not to build a high-fidelity, production-ready solver, but to establish a mathematically clear, verifiable tire and vehicle dynamics foundation to conduct controlled sensitivity benchmarks on winter surfaces.
+	## 3. What Was Implemented
+The mathematical models and numerical simulations include:
+- A continuous empirical Magic Formula tire-force representation
+- A coupled longitudinal and lateral slip calculation module
+- A closed-loop, planar four-wheel vehicle dynamics solver
+- A 4th-order Runge-Kutta (RK4) time-domain simulation
+- A modular road-condition parameter factory (Phase 3J)
+- An illustrative snow-chain benchmarking script (Phase 3K)
 
-The benchmark compares:
+## 4. Modelling Approach
+The foundation of the tire model is the Magic Formula, representing longitudinal tire force $F'x$ as:
 
-1. **Snow** — the baseline parameterized snow condition
-2. **SnowChain** — a controlled sensitivity case with increased longitudinal Magic Formula peak-factor scaling
+$$
+F_x = F_z D \sin\left[
+C \tan^{-1}\left[
+B\kappa - E\left(B\kappa - \tan^y-1}(B\kappa)\right)
+\right]
+\right]
+$$
 
-Only the longitudinal pure-slip parameter was modified. The lateral and combined-slip parameter sets were retained to isolate the intended modelling change.
+- $F_x$ is longitudinal tire force.
+- $F_z$ is normal tire load.
+- $\kappa$ is longitudinal slip ratio.
+- $B$, $C$, $D$, and $E$ are empirical model parameters.
+- $D$ is treated as a dimensionless peak-factor parameter in this simplified model.
 
-The SnowChain modification is an **illustrative modelling assumption**, not an experimentally measured coefficient set for a particular tire, chain, snow depth, or temperature.
+It must not be presented as a universal measured friction coefficient.
 
-## Selected Results
+## 5. Snow-Chain Sensitivity Case
+To study the vehicle-level effects of enhanced traction, a controlled benchmark compares a parameterized baseline snow condition against a modified snow-chain case. The benchmark changes only the longitudinal pure-slip peak-factor parameter:
 
-### Straight braking
+$$
+D_{x,\mathrm{chain}} = 1.5D_{x,\mathrm{snow}}
+$$
 
-![Straight braking distance comparison](results/figures/3K_braking_distance.png)
+- Baseline snow: $D_x = 0.30$
+- Snow-chain sensitivity case: $D_x = 0.45$
+- Lateral parameters unchanged
+- Combined-slip parameters unchanged
+- Vehicle parameters unchanged
+- Maneuver and simulation settings unchanged
 
-| Case | Braking distance |
-|---|---:|
-| Snow | 4.850 m |
-| SnowChain benchmark | 4.724 m |
+The factor 1.5 is an illustrative modelling assumption, not a measured or universally applicable snow-chain enhancement factor. It is not an experimentally validated physical model of a tire fitted with chains.
+	## 6. Key Results
+The simulated responses for both cases are summarized below:
 
-This corresponds to an approximate **2.6% reduction** under the selected manoeuvre and model assumptions.
+| Metric | Snow | Snow-chain sensitivity case | Difference |
+|t--|---:|---:|---:|
+| Acceleration final speed | 3.736 m/s | 3.822 m/s | +0.086 m/s |
+| Acceleration peak longitudinal force | 56.038 N | 57.335 N | +1.297 N |
+| Braking distance | 4.850 m | 4.724 m | -0.126 m |
+| Braking final speed threshold | 0.100 m/s | 0.100 m/s | Approximately unchanged |
+| Cornering peak lateral force | 37.455 N | 37.508 N | +0.054 N |
+| Cornering peak yaw rate | 0.159 rad/s | 0.135 rad/s | -0.024 rad/s |
+| Final lateral deviation | 1.063 m | 0.944 m | -0.119 m |
 
-This is a model-sensitive comparison, not a prediction of real-world snow-chain braking performance.
+- Simulated acceleration response increased modestly.
+- Simulated braking distance decreased by approximately 2.6%.
+- Lateral-force values remained nearly unchanged because lateral parameters were preserved.
+- Yaw response and lateral trajectory changed during cornering.
+- These are model-sensitivity results, not real-world performance predictions.
+	## 7. Results and Visualizations
 
-### Constant-cornering trajectory
-
-![Constant cornering trajectory comparison](results/figures/3K_cornering_trajectory.png)
-
-The two cases produced different simulated lateral trajectories. This demonstrates that changing longitudinal tire-force behaviour can influence coupled vehicle response through the vehicle-dynamics equations.
-
-The result is described conservatively as an **altered yaw response and lateral trajectory**, not proof of improved stability or superior real-world handling.
-
-### Dynamic longitudinal force versus slip
-
+### Dynamic Longitudinal Force vs. Slip
 ![Dynamic longitudinal force versus slip](results/figures/3K_fx_vs_kappa.png)
 
-This figure shows the dynamic longitudinal-force response of the front-left wheel during the benchmark manoeuvre.
+This diagnostic shows the evolving longitudinal-force response of the front-left wheel during the braking benchmark maneuver. It represents a model-driven simulation path, not a universal empirical capacity curve.
 
-### Dynamic force trace
+### Straight Braking Distance
+![Straight braking distance comparison](results/figures/3K_braking_distance.png)
 
+This simulation compares the integrated vehicle-stopping distance. The benchmark produces a 2.6% reduction based purely on the assumed 1.5x scaling of the longitudinal $D$ parameter.
+
+### Cornering Trajectory
+![Constant cornering trajectory comparison](results/figures/3K_cornering_trajectory.png)
+
+This diagnostic traces the global (X,Y) coordinates of the vehicle during a constant-steering maneuver. The altered yaw response and lateral trajectory are simulation results that demonstrate sensitivity coupling, not proof of improved stability.
+
+### Dynamic Force Trace
 ![Dynamic force trace](results/figures/3K_force_utilization.png)
 
-This figure shows the evolving longitudinal and lateral tire-force components for the front-left wheel during cornering.
+This diagnostic plots the instantaneous longitudinal and lateral tire-force components for the front-left wheel during cornering. It is purely a force-utilization trace for the simulation—not a measured friction boundary, friction ellipse, or experimentally established envelope.
 
-It is a force-utilization diagnostic—not a measured friction boundary, friction ellipse, or experimentally established tire-capacity envelope.
+## 8. Verification
+**225/225 tests passed.**
 
-## Main Numerical Observations
+A robust regression suite was developed incrementally alongside the model to ensure physical consistency and mathematical stability. Verification covered:
+- Slip-ratio calculations
+- Tire-force calculations
+- Four-wheel kinematics
+- Lateral-force behaviour
+- Combined slip
+- Load transfer
+- Integrated tire forces
+- Closed-loop dynamics
+- Time-domain simulation
+- Trajectory integration
+- Vehicle-performance analysis
+- Road-condition handling
+- Snow-chain benchmark behaviour
 
-Under the selected simulation conditions:
+Verification establishes implementation consistency and regression protection; it does not replace experimental validation.
+## 9. Limitations
+The current computational framework relies on simplified mathematical assumptions. It does not explicitly include:
+- Experimentally identified tire-force coefficients
+- Detailed snow material behaviour
+- Snow temperature, density, moisture, compaction, or microstructure
+- Chain geometry and penetration
+- Chain–tire contact mechanics
+- Snow displacement and local pressure effects
+- Chain wear
+- Detailed tire deformation
+- Complete suspension and compliance behaviour
+- Full wheel rotational dynamics
+- Production-vehicle control systems
+- Experimental validation
 
-- Straight-acceleration final speed increased from approximately **3.736 m/s** to **3.822 m/s**
-- Peak longitudinal force increased from approximately **56.038 N** to **57.335 N**
-- Straight-braking distance decreased from approximately **4.850 m** to **4.724 m**
-- Peak lateral force during constant cornering remained nearly unchanged
-- Peak yaw rate and final lateral deviation changed between the two cases
-- The differences arose from the implemented tire-force sensitivity and its coupling to the four-wheel vehicle equations
+## 10. Future Research Direction
+This foundational model opens the door to deeper, experimentally grounded investigations:
+- Tire–snow interaction
+- Tire–ice interaction
+- Very low-friction conditions such as black ice
+- Experimental tire and vehicle testing
+- Snow and ice surface characterisation
+- Tread and rubber-compound effects
+- Temperature and moisture effects
+- Parameter identification
+- Model calibration and validation
+- Transient tire-force response
+- More physically informed tire–surface interaction models
 
-These observations are specific to the current model, manoeuvres, parameter values, and numerical setup.
-
-## Model Scope and Limitations
-
-The current framework does not explicitly model:
-
-- Snow compaction, shear, or digging
-- Tread-block deformation
-- Snow depth, temperature, water content, or microstructure
-- Tire rubber-compound temperature dependence
-- Detailed chain geometry or chain–snow contact
-- Wheel inertia and drivetrain torque dynamics
-- Pitch, roll, or heave dynamics
-- Experimental calibration or validation
-
-Snow is represented through parameterized tire-force behaviour. The SnowChain case is a controlled sensitivity modification rather than a complete physical model of a chained tire.
-
-## Verification
-
-The project was developed incrementally with component-level verification suites covering tire modelling, vehicle kinematics, force generation, load transfer, vehicle dynamics, simulation, trajectory integration, and analysis.
-
-The completed regression record reported:
-
-```text
-225 / 225 tests passed
-```
-
-The repository retains the component verification scripts. The consolidated result was obtained by running them sequentially; a single unified regression runner is not currently included.
-
-## Reproducibility
-
+## 11. Repository Structure
+- `matlab/tire/`: Fundamental equations for slip, pure forces, and combined-slip modifications.
+- `matlab/vehicle/`: Kinematics, load transfer, and four-wheel dynamics.
+- `matlab/simulation/`: Time-domain RK4 integration and verification scripts.
+- `matlab/analysis/`: Maneuver wrappers, metric extraction, and Phase 3K snow-chain benchmarking.
+- `docs/theory/`: Mathematical formulation and design rationale.
+- `results/`: Verified output data, diagnostic metrics, and comparative plots.
+## 12. Reproducibility
 Principal MATLAB entry points:
-
-```text
-matlab/analysis/runSnowChainBenchmark.m
-matlab/analysis/runSnowChainResults.m
-matlab/simulation/verifySnowChainBenchmark.m
-```
+- `matlab/analysis/runSnowChainBenchmark.m`
+- `matlab/analysis/runSnowChainResults.m`
+- `matlab/simulation/verifySnowChainBenchmark.m`
 
 Figures are stored under:
-
-```text
-results/figures/
-```
+- `results/figures/`
 
 Detailed numerical results should be documented in:
-
-```text
-results/README.md
-```
+- `results/README.md`
 
 Supporting theory documents are stored under:
+- `docs/theory/`
 
-```text
-docs/theory/
-```
-
-## Future Research Direction
-
-The next stage would investigate:
-
-- Tire–snow interaction
-- Tire–ice interaction, including very low-friction black-ice conditions
-- The influence of tread characteristics on traction
-- Experimental tire and vehicle testing
-- Tire-force parameter identification
-- Calibration against measured data
-- Validation of simplified vehicle models
-- More physically grounded snow and ice contact models
-
-A major learning objective is understanding how researchers connect simplified computational models with experimental observations and progressively improve model fidelity.
-
-## References
-
+## 13. References / Further Reading
 The project is informed by literature on empirical tire-force modelling, combined tire forces, vehicle dynamics, tire–snow interaction, tire–ice interaction, snow-chain traction, and experimental parameter identification.
 
-A detailed reference list should be maintained in:
+A detailed list of referenced literature can be found in:
+[docs/references.md](docs/references.md)
 
-```text
-docs/references.md
-```
-
-## Project Status
-
-**Status:** Preliminary computational research study completed through the simplified SnowChain benchmark.
-
-The implementation is intentionally limited in scope, establishing a foundation in tire mechanics, four-wheel vehicle dynamics, numerical simulation, and research methodology before progressing toward advanced snow and ice interaction modelling.
