@@ -150,8 +150,8 @@ Revised Phase 3K figures are stored under:
 The earlier illustrative figures are preserved under:
 - `results/original_illustrative_run/`
 
-Detailed numerical results should be documented in:
-- `results/README.md`
+The earlier parameterisation and its numerical results are documented separately:
+- [Second sensitivity scenario](docs/second_sensitivity_scenario.md)
 
 Supporting theory documents are stored under:
 - `docs/theory/`
