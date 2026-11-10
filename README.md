@@ -48,7 +48,7 @@ The parameter `D` is a mathematical scale factor in the continuous equation. It 
 ## 5. Snow-Chain Sensitivity Case
 To study the vehicle-level effects of a change in traction, a controlled benchmark compares a parameterized baseline `Snow` condition against a modified `SnowChain` sensitivity case. The benchmark changes only the pure longitudinal Magic Formula parameter `Dx`:
 
-- Selected snow pure-slip reference set: `B = 5.0`, `C = 2.0`, `D = 0.30`, `E = 1.0`.
+- Selected snow pure-slip reference set: `B = 5.0`, `C = 2.0`, `D = 0.30`, `E = 1.0`. ( from Mathworks )
 - SnowChain sensitivity case: `Dx = 0.45`, obtained by applying the existing 1.5× illustrative multiplier to baseline `Dx`.
 - The same values are provisionally used for lateral pure-slip behaviour as a symmetry assumption, not as a separately validated lateral snow-tire set.
 - The lateral and combined-slip parameter sets are otherwise kept unchanged in the SnowChain comparison.
