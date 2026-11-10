@@ -63,26 +63,36 @@ The benchmark compares:
 
 Only the longitudinal pure-slip parameter was modified. The lateral and combined-slip parameter sets were retained to isolate the intended modelling change.
 
-The SnowChain modification is an **illustrative modelling assumption**, not an experimentally measured coefficient set for a particular tire, chain, snow depth, or temperature.
+The selected snow pure-slip reference set is **B = 5.0, C = 2.0, D = 0.30, E = 1.0**. The same values are provisionally used for lateral pure-slip behaviour as a symmetry assumption, not as a separately validated lateral snow-tire set. SnowChain applies the existing illustrative 1.5× multiplier to longitudinal `Dx`, giving `Dx = 0.45`. This is an **illustrative modelling assumption**, not an experimentally measured coefficient set for a particular tire, chain, snow depth, or temperature.
 
 ## Selected Results
 
+| Metric | Snow | SnowChain | Difference |
+|---|---:|---:|---:|
+| Acceleration final speed | 3.868 m/s | 3.912 m/s | +0.044 m/s (+1.1%) |
+| Acceleration peak longitudinal force | 58.021 N | 58.681 N | +0.660 N (+1.1%) |
+| Braking distance | 4.664 m | 4.609 m | −0.055 m (−1.2%) |
+| Cornering peak lateral force | 67.682 N | 67.712 N | +0.030 N (+0.044%) |
+| Cornering peak yaw rate | 0.159 rad/s | 0.135 rad/s | −0.025 rad/s (−15.5%) |
+| Final lateral deviation | 1.142 m | 1.007 m | −0.135 m (−11.8%) |
+
+
 ### Straight braking
 
-![Straight braking distance comparison](results/figures/3K_braking_distance.png)
+![Straight braking distance comparison](results/reference_snow_run/figures/3K_braking_distance.png)
 
 | Case | Braking distance |
 |---|---:|
-| Snow | 4.850 m |
-| SnowChain benchmark | 4.724 m |
+| Snow | 4.664 m |
+| SnowChain benchmark | 4.609 m |
 
-This corresponds to an approximate **2.6% reduction** under the selected manoeuvre and model assumptions.
+This corresponds to an approximate **1.2% reduction** under the selected manoeuvre and model assumptions.
 
 This is a model-sensitive comparison, not a prediction of real-world snow-chain braking performance.
 
 ### Constant-cornering trajectory
 
-![Constant cornering trajectory comparison](results/figures/3K_cornering_trajectory.png)
+![Constant cornering trajectory comparison](results/reference_snow_run/figures/3K_cornering_trajectory.png)
 
 The two cases produced different simulated lateral trajectories. This demonstrates that changing longitudinal tire-force behaviour can influence coupled vehicle response through the vehicle-dynamics equations.
 
@@ -90,13 +100,13 @@ The result is described conservatively as an **altered yaw response and lateral 
 
 ### Dynamic longitudinal force versus slip
 
-![Dynamic longitudinal force versus slip](results/figures/3K_fx_vs_kappa.png)
+![Dynamic longitudinal force versus slip](results/reference_snow_run/figures/3K_fx_vs_kappa.png)
 
 This figure shows the dynamic longitudinal-force response of the front-left wheel during the benchmark manoeuvre.
 
 ### Dynamic force trace
 
-![Dynamic force trace](results/figures/3K_force_utilization.png)
+![Dynamic force trace](results/reference_snow_run/figures/3K_force_utilization.png)
 
 This figure shows the evolving longitudinal and lateral tire-force components for the front-left wheel during cornering.
 
@@ -106,11 +116,11 @@ It is a force-utilization diagnostic—not a measured friction boundary, frictio
 
 Under the selected simulation conditions:
 
-- Straight-acceleration final speed increased from approximately **3.736 m/s** to **3.822 m/s**
-- Peak longitudinal force increased from approximately **56.038 N** to **57.335 N**
-- Straight-braking distance decreased from approximately **4.850 m** to **4.724 m**
-- Peak lateral force during constant cornering remained nearly unchanged
-- Peak yaw rate and final lateral deviation changed between the two cases
+- Straight-acceleration final speed increased from approximately **3.868 m/s** to **3.912 m/s**
+- Peak longitudinal force increased from approximately **58.021 N** to **58.681 N**
+- Straight-braking distance decreased from approximately **4.664 m** to **4.609 m**
+- Peak lateral force during constant cornering changed from **67.682 N** to **67.712 N**
+- Peak yaw rate changed from **0.159 rad/s** to **0.135 rad/s**; final lateral deviation changed from **1.142 m** to **1.007 m**
 - The differences arose from the implemented tire-force sensitivity and its coupling to the four-wheel vehicle equations
 
 These observations are specific to the current model, manoeuvres, parameter values, and numerical setup.
@@ -137,7 +147,9 @@ The project was developed incrementally with component-level verification suites
 The completed regression record reported:
 
 ```text
-225 / 225 tests passed
+Revised Phase 3K: 4 / 4 tests passed
+Closed-Loop Vehicle Dynamics (3F): 22 / 22 tests passed
+Full regression suite: not rerun after the coefficient revision
 ```
 
 The repository retains the component verification scripts. The consolidated result was obtained by running them sequentially; a single unified regression runner is not currently included.
@@ -155,8 +167,10 @@ matlab/simulation/verifySnowChainBenchmark.m
 Figures are stored under:
 
 ```text
-results/figures/
+results/reference_snow_run/figures/
 ```
+
+The earlier illustrative plots are retained under `results/original_illustrative_run/`.
 
 Detailed numerical results should be documented in:
 
