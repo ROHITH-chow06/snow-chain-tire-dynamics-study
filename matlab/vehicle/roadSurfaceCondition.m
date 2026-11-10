@@ -68,8 +68,8 @@ function condition = roadSurfaceCondition(surfaceType)
             
             % Pure-slip coefficients
             condition.pure_params = struct(...
-                'Bx', 4.0, 'Cx', 1.20, 'Dx', 0.30, 'Ex', 0.97, ...
-                'By', 4.0, 'Cy', 1.20, 'Dy', 0.30, 'Ey', 0.97);
+                'Bx', 5.0, 'Cx', 2.0, 'Dx', 0.30, 'Ex', 1.0, ...
+                'By', 5.0, 'Cy', 2.0, 'Dy', 0.30, 'Ey', 1.0);
             
             % Combined-slip coefficients
             % Shape factor C further reduced for highly compliant shear behavior

@@ -17,7 +17,7 @@ function runSnowChainResults()
     c_chain = [0.8500 0.3250 0.0980]; % Orange
 
     % Create directory for figures if it doesn't exist
-    fig_dir = fullfile(pwd, 'results', 'figures');
+    fig_dir = fullfile(pwd, 'results', 'reference_snow_run', 'figures');
     if ~exist(fig_dir, 'dir')
         mkdir(fig_dir);
     end
